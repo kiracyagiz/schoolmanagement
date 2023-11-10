@@ -7,27 +7,30 @@ import { auth } from "../firebase";
 const Register = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
-  const { register,currentUser,addUserData } = useAuth();
+  const { register, currentUser, addUserData } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [selectedRole,setSelectedRole] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const handleSubmit = async (e) => {
+      e.preventDefault();
 
-    const email = emailRef.current.value;
-    const password = passwordRef.current.value;
+      const email = emailRef.current.value;
+      const password = passwordRef.current.value;
 
-    try {
-      setLoading(true);
-      await register(auth, email, password);
-      await addUserData(email,currentUser.uid)
-      router.push("/login");
-    } catch (error) {
-      alert(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        setLoading(true);
+        let uid = await register(auth, email, password,selectedRole);
+        await addUserData(email, uid,selectedRole);
+          router.push("/login");
+        
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        setLoading(false);
+      }
+
+    };
   return (
     <div className="flex flex-col gap-y-8 p-8">
       {loading ? (
@@ -53,6 +56,13 @@ const Register = () => {
               required
               className="border border-black outline-none p-2"
             />
+            <select
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+            >
+              <option value="student">Öğrenci</option>
+              <option value="teacher">Öğretmen</option>
+            </select>
             <button type="submit">Register</button>
           </form>
         </div>

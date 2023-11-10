@@ -1,10 +1,11 @@
 "use client"
 
-import { BiSolidDashboard, BiCar, BiNotification ,BiLogOut,BiArrowFromLeft} from "react-icons/bi";
+import { BiSolidDashboard, BiCar, BiNotification ,BiLogOut} from "react-icons/bi";
 import { TbBrandBooking } from "react-icons/tb";
 import { FiSettings } from "react-icons/fi";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 const DashboardLine = ({currentUser,logout}) => {
 
   const [active,setActive] = useState(false)
@@ -21,12 +22,14 @@ const DashboardLine = ({currentUser,logout}) => {
   }
 
   const data = [
-    { name: "Dashboard" },
-    { name: "Drivers" },
-    { name: "Bookings" },
-    { name: "Notifications" },
-    { name: "Settings" },
+    { name: "Dashboard" ,id:'/dashboard'},
+    { name: "Drivers" ,id:'/dashboard'},
+    { name: "Bookings" ,id:'/dashboard'},
+    { name: "Notifications" ,id:'/dashboard'},
+    { name: "Settings",id:'/dashboard' },
   ];
+
+
 
   const icons = [
     BiSolidDashboard,
@@ -44,16 +47,21 @@ const DashboardLine = ({currentUser,logout}) => {
     {`${active ? 'X' : '->'}`}
   </button>
   <h1 className={`text-white ${active ? 'block' : 'hidden'} text-3xl text-center mt-8 mb-20`}>HR LOGO</h1>
+  
+  <h1 className="text-4xl text-black"></h1>
   {data.map((dt, i) => {
     const Icon = icons[i];
 
+
     return (
+     <Link href={dt.id}>
       <div className={`text-white text-2xl cursor-pointer hover:bg-blue-600 ${active ? 'w-80' : 'w-fit'} p-4 px-8 hover:shadow-2xl flex items-center gap-x-8 mb-4 mt-8 ml-4`}
       key={i}
       >
         <Icon  size={35} />
         <p>{`${active ? dt.name : ''}`}</p>
       </div>
+     </Link>
     );
   })}
 

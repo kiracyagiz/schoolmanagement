@@ -2,55 +2,53 @@
 
 import DashboardLine from "../components/Dashboard/DashboardLine";
 import { useAuth } from "../firebase";
-import { db } from "../firebase";
 import { useEffect ,useState} from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import Courses from "../components/Course/Courses";
 
 const Dashboard = () => {
 
-    const {logout,currentUser} = useAuth();
-    const [userData, setUserData] = useState(null);
+    const {logout,currentUser,getFirebaseUserData} = useAuth();
+    const [userData, setUserData] = useState([]);
+    const [courseData,setCourseData] = useState([])
     const router = useRouter();
 
     useEffect(() => {
       if(!currentUser){
         router.push('/')
       }
+      else{
+        const userUID = currentUser.uid
+        getFirebaseUserData(userUID,setUserData)
+      }
   
     }, [])
-    
 
-    useEffect(() => {
-      if (currentUser) {
-        const userUID = currentUser.uid;
-        const colRef = collection(db, 'users');
-        const q = query(colRef, where("uid", "==", userUID));
-  
-        const fetchData = async () => {
-          try {
-            const snapshot = await getDocs(q);
-            if (!snapshot.empty) {
-              snapshot.forEach((doc) => {
-                setUserData(doc.data());
-              });
-            } else {
-              console.log("Kullanıcı verisi bulunamadı.");
-            }
-          } catch (err) {
-            console.error(err.message);
-          }
-        };
-  
-        fetchData();
+
+    useEffect(()=> {
+      if(userData)
+      {
+        setCourseData(userData.courses)
+    
       }
-    }, [userData]);
+    },[userData])
+
+   
+
+
   
   return (
     <div className="flex"> 
     {currentUser && 
         <DashboardLine currentUser={currentUser} logout={logout}/>
     }
+      <div  className="flex flex-col gap-y-4 ">
+
+    
+
+   </div>
+  <Courses courseData={courseData}/>
+
 
     </div>
   )
