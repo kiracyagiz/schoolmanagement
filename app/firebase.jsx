@@ -6,7 +6,7 @@ import { createContext,useContext,useEffect,useState } from "react";
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import {createUserWithEmailAndPassword, getAuth,onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile} from 'firebase/auth'
-import { getFirestore, collection, addDoc, serverTimestamp, getDocs , query, where} from 'firebase/firestore';
+import { getFirestore, collection, addDoc, serverTimestamp, getDocs ,onSnapshot,updateDoc, query, where, Firestore} from 'firebase/firestore';
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -28,6 +28,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
+
 export const auth = getAuth(app)
 
 const AuthContext = createContext();
@@ -39,6 +40,7 @@ export function useAuth(){
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userData,setUserData] = useState([]);
 
   function signup(email, password) {
     return signInWithEmailAndPassword(auth, email, password);
@@ -86,37 +88,38 @@ export function AuthProvider({ children }) {
   }, []);
 
 
-   const getFirebaseUserData = async (userUID,setUserData) => {
+
+
+  
+  
+  const getFirebaseUserData = (userUID) => {
     const colRef = collection(db, 'users');
     const q = query(colRef, where("uid", "==", userUID));
-    
-    try {
-      const snapshot = await getDocs(q);
+  
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) {
         snapshot.forEach((doc) => {
           setUserData(doc.data());
-       
+          setLoading(false);
         });
       } else {
         console.log("Kullanıcı verisi bulunamadı.");
-        return null;
+        setUserData(null); 
+        setLoading(false);
       }
-    } catch (err) {
-      console.error(err.message);
-      return null;
-    }
+    });
+  
+    return unsubscribe; 
   };
+
 
 
 
 const getCoursesData = async (courseID) => {
   const colRef = collection(db, "courses");
   const q = query(colRef, where("uid", "==", courseID));
-
-
   try {
     const snapshot = await getDocs(q);
-
     if (!snapshot.empty) {
       const coursesData = snapshot.docs.map((doc) => doc.data());
       return coursesData;
@@ -129,8 +132,29 @@ const getCoursesData = async (courseID) => {
     return null;
   }
 };
-  
 
+
+const addCourseToUser = async (uid, courseId) => {
+  try {
+    const userRef = collection(db, 'users');
+    const userDoc = await getDocs(userRef);
+
+    userDoc.forEach(async (doc) => {
+      if (doc.data().uid === uid) {
+        const userDocRef = doc.ref;
+        await updateDoc(userDocRef, {
+          courses: [...doc.data().courses, { courseId }], // courseId added as an object
+        });
+      }
+    });
+
+    console.log('Kurs başarıyla eklendi.');
+    return true;
+  } catch (error) {
+    console.error('Kurs eklerken bir hata oluştu: ', error);
+    return false;
+  }
+};
 
 
  
@@ -142,7 +166,10 @@ const getCoursesData = async (courseID) => {
     register,
     addUserData,
     getFirebaseUserData,
-    getCoursesData
+    getCoursesData,
+    userData,
+    loading,
+    addCourseToUser
   };
 
   return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;

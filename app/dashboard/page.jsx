@@ -1,57 +1,49 @@
-"use client"
+"use client";
 
 import DashboardLine from "../components/Dashboard/DashboardLine";
 import { useAuth } from "../firebase";
-import { useEffect ,useState} from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Courses from "../components/Course/Courses";
+import CourseAddModal from "../components/Modals/CourseAddModal";
 
 const Dashboard = () => {
+  const { logout, currentUser, getFirebaseUserData, userData } = useAuth();
 
-    const {logout,currentUser,getFirebaseUserData} = useAuth();
-    const [userData, setUserData] = useState([]);
-    const [courseData,setCourseData] = useState([])
-    const router = useRouter();
+  const router = useRouter();
 
-    useEffect(() => {
-      if(!currentUser){
-        router.push('/')
-      }
-      else{
-        const userUID = currentUser.uid
-        getFirebaseUserData(userUID,setUserData)
-      }
-  
-    }, [])
+  useEffect(() => {
+    if (!currentUser) {
+      router.push("/");
+    } else {
+      getFirebaseUserData(currentUser.uid);
+    }
+  }, []);
 
 
-    useEffect(()=> {
-      if(userData)
-      {
-        setCourseData(userData.courses)
-    
-      }
-    },[userData])
-
+  useEffect(() => {
    
 
-
-  
-  return (
-    <div className="flex"> 
-    {currentUser && 
-        <DashboardLine currentUser={currentUser} logout={logout}/>
-    }
-      <div  className="flex flex-col gap-y-4 ">
-
+      if (userData.role == 'teacher') {
+        router.push('/dashboard/teacher')
+      }
+      else {
     
+      }
+   
+  }, [userData])
+  
 
-   </div>
-  <Courses courseData={courseData}/>
 
+  return (
+    <div className="flex">
+      {currentUser && (
+        <DashboardLine currentUser={currentUser} logout={logout} />
+      )}
 
+      <Courses currentUser={currentUser} />
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

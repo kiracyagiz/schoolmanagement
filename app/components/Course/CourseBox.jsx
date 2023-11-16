@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const CourseBox = ({className,uid}) => {
-  console.log(uid,'asddsadsadsadsa')
+
   return (
     <Link href={`/courses/${uid}`}>
     <div className={`w-70 min-w-[300px] text-lg h-40 p-10 bg-green-400 `} >
@@ -11,6 +11,9 @@ const CourseBox = ({className,uid}) => {
 
         <p>Professor Name</p>
         
+        <div>
+
+        </div>
     </div>
     </Link>
   )

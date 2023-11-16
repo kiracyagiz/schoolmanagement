@@ -65,6 +65,7 @@ const DashboardLine = ({currentUser,logout}) => {
     );
   })}
 
+
    <div className="flex flex-col gap-y-4">
    <p className="text-white text-center ">
       <p className="text-blue-600">Welcome!!</p>

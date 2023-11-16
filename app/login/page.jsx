@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 const Login = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
-  const { signup,currentUser } = useAuth();
+  const { signup ,currentUser} = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e) => {
@@ -21,16 +21,10 @@ const Login = () => {
       await signup(email, password);
       router.push('/dashboard');
 
-      // if(currentUser.status == 'teacher'){
-      //   router.push('/teacher');
-      // }
-      // else {
-      //   router.push('/dashboard');
-      // }
     
 
-    } catch (error) {
-      alert(error.message);
+      } catch (error) {
+        alert(error.message);
     }
   }
 

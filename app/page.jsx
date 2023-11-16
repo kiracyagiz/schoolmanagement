@@ -8,15 +8,20 @@ const App = () => {
 
   
   const {currentUser} = useAuth();
+
   const router = useRouter();
 
   useEffect(() => {
     if (currentUser) {
       router.push('/dashboard')
     }
+    else{
+      
+    }
 
    
-  }, [currentUser])
+  })
+
   
 
   return (
@@ -24,7 +29,7 @@ const App = () => {
       
       <button className="p-4 bg-blue-600" onClick={()=> router.push('/register')}>Register</button>
       <button className="p-4 bg-green-600"  onClick={()=> router.push('/login')}>Login</button>
-      <button className="p-4 bg-green-600"  onClick={()=> router.push('/teacher/login')}>Teacher Login</button>
+      <button className="p-4 bg-green-600"  onClick={()=> router.push('/teacher')}>Teacher Login</button>
 
 
     </div>
